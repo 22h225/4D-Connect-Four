@@ -110,7 +110,7 @@
 		<tr><td>{$players?.[0].name}</td><td>黒</td></tr>
 		<tr><td>{$players?.[1].name}</td><td>白</td></tr>
 		<tr><td>現在のプレイヤー</td><td>{$currentPlayer?.name}</td></tr>
-		{#if role}
+		{#if $role}
 			<tr><td>あなたは</td><td>{$role}</td></tr>
 		{/if}
 	</table>

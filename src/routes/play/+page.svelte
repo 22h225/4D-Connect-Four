@@ -3,6 +3,7 @@
 	import { Canvas } from '@threlte/core';
 	import { Environment } from '@threlte/extras';
 	import { io } from 'socket.io-client';
+	import Icon from '@iconify/svelte';
 	import { page } from '$app/stores';
 	import { ENVIRONMENT_HDR, type Role } from '$lib/constants';
 	import back_arrow_icon from '$lib/images/back-arrow-icon.svg';
@@ -74,7 +75,7 @@
 		$result = $game.result;
 	}
 
-	function onKeydown(e: KeyboardEvent & { currentTarget: EventTarget & Window }) {
+	function onKeydown(e: KeyboardEvent) {
 		if (!$result?.finished && e.key == 'Control') {
 			if ($room) socket.emit('playTurn', $room, [$x, $y, $z, $w]);
 			else {
@@ -90,13 +91,57 @@
 			}
 		}
 	}
+
+	let scene: Scene;
+
+	function dispatchKeyboardEvent(key: string) {
+		onKeydown(new KeyboardEvent('keydown', { key: key }));
+		scene.onKeydown(new KeyboardEvent('keydown', { key: key }));
+	}
 </script>
+
+<div class="touch">
+	<table>
+		<tr>
+			<td></td>
+			<td on:click={() => dispatchKeyboardEvent('q')}>
+				<Icon icon="fluent:arrow-reply-16-filled" style="font-size: 1.5em;" />
+			</td>
+			<td on:click={() => dispatchKeyboardEvent(' ')}>
+				<Icon icon="fluent:arrow-right-16-filled" style="font-size: 1.5em;" rotate={3} />
+			</td>
+			<td on:click={() => dispatchKeyboardEvent('e')}>
+				<Icon icon="fluent:arrow-reply-16-filled" style="font-size: 1.5em;" hFlip={true} />
+			</td>
+			<td on:click={() => dispatchKeyboardEvent('w')}>
+				<Icon icon="fluent:arrow-undo-16-filled" style="font-size: 1.5em;" rotate={2} />
+			</td>
+		</tr>
+		<tr>
+			<td on:click={() => dispatchKeyboardEvent('Control')}>
+				<Icon icon="fluent:radio-button-16-filled" style="font-size: 1.5em;" />
+			</td>
+			<td on:click={() => dispatchKeyboardEvent('a')}>
+				<Icon icon="fluent:arrow-right-16-filled" style="font-size: 1.5em;" rotate={2} />
+			</td>
+			<td on:click={() => dispatchKeyboardEvent('Shift')}>
+				<Icon icon="fluent:arrow-right-16-filled" style="font-size: 1.5em;" rotate={1} />
+			</td>
+			<td on:click={() => dispatchKeyboardEvent('d')}>
+				<Icon icon="fluent:arrow-right-16-filled" style="font-size: 1.5em;" />
+			</td>
+			<td on:click={() => dispatchKeyboardEvent('s')}>
+				<Icon icon="fluent:arrow-undo-16-filled" style="font-size: 1.5em;" />
+			</td>
+		</tr>
+	</table>
+</div>
 
 <svelte:window on:keydown={onKeydown} bind:innerWidth bind:innerHeight />
 
 <Canvas size={{ width: innerWidth, height: innerHeight }}>
 	<Environment files={ENVIRONMENT_HDR} isBackground={true} format="hdr" />
-	{#if $config}<Scene />{/if}
+	{#if $config}<Scene bind:this={scene} />{/if}
 </Canvas>
 
 <div class="overlay back">
@@ -140,6 +185,12 @@
 {/if}
 
 <style lang="scss">
+	@mixin tabletView {
+		@media screen and (max-width: 1024px) {
+			@content;
+		}
+	}
+
 	:root {
 		color: white;
 	}
@@ -147,6 +198,25 @@
 	.overlay {
 		pointer-events: none;
 		z-index: 1;
+	}
+
+	.touch {
+		display: none;
+
+		@include tabletView() {
+			display: block;
+			position: absolute;
+			padding: 1rem;
+			bottom: 0;
+			right: 0;
+
+			table tr td {
+				width: 5rem;
+				height: 5rem;
+				text-align: center;
+				background-color: rgba(25, 25, 25, 0.4);
+			}
+		}
 	}
 
 	.back,
@@ -172,6 +242,10 @@
 	.control {
 		bottom: 0;
 		right: 0;
+
+		@include tabletView() {
+			display: none;
+		}
 	}
 
 	.status {

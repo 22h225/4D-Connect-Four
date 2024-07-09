@@ -28,7 +28,8 @@
 	let camera: PerspectiveCamera | undefined;
 	$: isSelectingPositionEmpty = !$board?.[$x]?.[$y]?.[$z]?.[$w];
 
-	function onKeydown(e: KeyboardEvent & { currentTarget: EventTarget & Window }) {
+	export function onKeydown(e: KeyboardEvent) {
+		console.log(e.key)
 		if (!$result?.finished) {
 			if (camera) {
 				let c = new Vector2(camera.position.x, camera.position.z).normalize().angle() / Math.PI;
@@ -54,7 +55,7 @@
 
 			w.update((n) => clamp(n + Number(e.key == 'e') - Number(e.key == 'q'), 0, wLength - 1));
 			y.update((n) =>
-				clamp(n + Number(e.code == 'Space') - Number(e.key == 'Shift'), 0, yLength - 1)
+				clamp(n + Number(e.key == ' ') - Number(e.key == 'Shift'), 0, yLength - 1)
 			);
 		}
 	}

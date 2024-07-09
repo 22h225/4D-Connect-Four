@@ -211,8 +211,8 @@
 			right: 0;
 
 			table tr td {
-				width: 5rem;
-				height: 5rem;
+				width: 4rem;
+				height: 4rem;
 				text-align: center;
 				background-color: rgba(25, 25, 25, 0.4);
 			}

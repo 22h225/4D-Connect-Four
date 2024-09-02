@@ -29,7 +29,7 @@
 	$: isSelectingPositionEmpty = !$board?.[$x]?.[$y]?.[$z]?.[$w];
 
 	export function onKeydown(e: KeyboardEvent) {
-		console.log(e.key)
+		// console.log(e.key)
 		if (!$result?.finished) {
 			if (camera) {
 				let c = new Vector2(camera.position.x, camera.position.z).normalize().angle() / Math.PI;

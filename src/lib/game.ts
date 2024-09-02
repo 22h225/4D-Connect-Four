@@ -6,7 +6,6 @@ const DIRECTIONS = VALUES.map((dx) =>
 	.flat(3)
 	.slice(1);
 
-
 // Type definitions for a 4-dimensional number array
 export type Number4D = [number, number, number, number];
 
@@ -126,35 +125,46 @@ export class Game {
 
 	// Judge the game state after a stone is placed
 	judge(player: Player, stone: Stone): Result {
-		let [x, y, z, w] = stone.position;
-		let stones: Stone[] = [stone];
+		let stones: Stone[] = [];
+		let positions = stone.position.reduce<number[][]>(
+			(acc, element) => {
+				const transformed = element === 1 ? [0, 1] : element === 2 ? [2, 3] : [element];
+				return acc.flatMap((arr) => transformed.map((value) => [...arr, value]));
+			},
+			[[]]
+		);
 
-		// Check all possible directions for a winning line
-		for (let direction of DIRECTIONS) {
-			let count = 1;
+		positionLoop: for (let position of positions) {
+			stones = [];
+			let [x, y, z, w] = position;
 
-			for (let m = 1; m < this.config.kCount; m++) {
-				let mx = x + m * direction[0];
-				let my = y + m * direction[1];
-				let mz = z + m * direction[2];
-				let mw = w + m * direction[3];
+			// Check all possible directions for a winning line
+			for (let direction of DIRECTIONS) {
+				let count = 0;
 
-				if (this.board[mx]?.[my]?.[mz]?.[mw]?.player !== stone.player) break;
-				count++;
-			}
+				for (let m = 0; m < this.config.kCount; m++) {
+					let mx = x + m * direction[0];
+					let my = y + m * direction[1];
+					let mz = z + m * direction[2];
+					let mw = w + m * direction[3];
 
-			// If a winning line is found
-			if (count === this.config.kCount) {
-				for (let n = 1; n < this.config.kCount; n++) {
-					let nx = x + n * direction[0];
-					let ny = y + n * direction[1];
-					let nz = z + n * direction[2];
-					let nw = w + n * direction[3];
-
-					let nstone = this.board[nx][ny][nz][nw];
-					if (nstone) stones.push(nstone);
+					if (this.board[mx]?.[my]?.[mz]?.[mw]?.player !== stone.player) break;
+					count++;
 				}
-				break;
+
+				// If a winning line is found
+				if (count === this.config.kCount) {
+					for (let n = 0; n < this.config.kCount; n++) {
+						let nx = x + n * direction[0];
+						let ny = y + n * direction[1];
+						let nz = z + n * direction[2];
+						let nw = w + n * direction[3];
+
+						let nstone = this.board[nx][ny][nz][nw];
+						if (nstone) stones.push(nstone);
+					}
+					break positionLoop;
+				}
 			}
 		}
 
